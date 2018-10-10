@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
+import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 
 @Configuration
 public class FilterConfig {
@@ -27,6 +28,7 @@ public class FilterConfig {
         filter.setAuthenticationConverter(authenticationConverter);
         filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
         filter.setAuthenticationFailureHandler(authenticationFailureHandler);
+        filter.setSecurityContextRepository(new WebSessionServerSecurityContextRepository());
         return  filter;
     }
 

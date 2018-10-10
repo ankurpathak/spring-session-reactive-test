@@ -7,20 +7,15 @@ import org.springframework.web.server.session.HeaderWebSessionIdResolver;
 import org.springframework.web.server.session.WebSessionIdResolver;
 
 @Configuration
-//@EnableRedisWebSession
 public class SessionConfig  {
 
-    /*
 
     @Bean
     public WebSessionIdResolver httpSessionStrategy() {
-       // HeaderWebSessionIdResolver sessionIdResolver = new HeaderWebSessionIdResolver();
-     //   sessionIdResolver.setHeaderName("X-Auth-Token");
+        HeaderWebSessionIdResolver sessionIdResolver = new HeaderWebSessionIdResolver();
+        sessionIdResolver.setHeaderName("X-Auth-Token");
         return sessionIdResolver;
-    }*/
-
-
-
+    }
 
 
 }
