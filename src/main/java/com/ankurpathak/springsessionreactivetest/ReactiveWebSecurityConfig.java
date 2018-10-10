@@ -40,8 +40,10 @@ public class ReactiveWebSecurityConfig {
                 .exceptionHandling()
                 .authenticationEntryPoint(authenticationEntryPoint)
                 .accessDeniedHandler(accessDeniedHandler)
+                .and()
         ;
         return http.build();
+
     }
 
 
