@@ -4,6 +4,7 @@ import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -18,13 +19,11 @@ public class CustomReactiveUserDetailsService implements ReactiveUserDetailsServ
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
-        return users.stream()
+        return Flux.fromIterable(users)
                 .filter(user -> Objects.equals(username, user.getEmail()) || Objects.equals(username, String.valueOf(user.getId())))
-                .findFirst()
-                .map(CustomUserDetails::new)
-                .map(x-> (UserDetails)x)
-                .map(Mono::just)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format(USERNAME_NOT_FOUND_MESSAGE, username)));
+                .next()
+                .switchIfEmpty(Mono.error(new UsernameNotFoundException(USERNAME_NOT_FOUND_MESSAGE)))
+                .map(CustomUserDetails::new);
     }
 
 

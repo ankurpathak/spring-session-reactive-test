@@ -28,7 +28,7 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if(!CollectionUtils.isEmpty(user.getRoles()))
-            return AuthorityUtils.createAuthorityList(user.getRoles().toArray(new String[user.getRoles().size()]));
+            return AuthorityUtils.createAuthorityList(user.getRoles().toArray(new String[]{}));
         else
             return Collections.emptyList();
     }
@@ -40,7 +40,6 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-
         //return String.valueOf(user.getId());
        return this.user.getEmail();
     }

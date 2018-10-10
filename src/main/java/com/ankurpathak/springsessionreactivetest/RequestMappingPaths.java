@@ -14,12 +14,7 @@ public interface RequestMappingPaths {
     String PATH_ROOT = "/";
 
     String PATH_INDEX = "index";
-
-
-
-
-
-
+    String PATH_FAVICON = "/favicon.ico";
 
 
     static String apiPath(String path){
