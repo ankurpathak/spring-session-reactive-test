@@ -1,5 +1,7 @@
 package com.ankurpathak.springsessionreactivetest;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import reactor.core.publisher.Flux;
@@ -46,10 +48,31 @@ public abstract class AbstractReactiveDomainService<T extends Domain<ID>, ID ext
 
 
     @Override
-    public Flux<T> findPaginated(final Pageable pageable) {
+    public Flux<T> findAll(final Pageable pageable) {
         ensure(pageable, notNullValue());
         return getDao().findAll(pageable);
     }
+
+
+    @Override
+    public Mono<Page<T>> all(final Pageable pageable){
+        return findAll(pageable)
+                .collectList()
+                .zipWith(count())
+                .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
+    }
+
+
+    @Override
+    public Mono<Page<T>> byCriteria(final Criteria criteria, Pageable pageable, Class<T> type){
+        return findByCriteria(criteria, pageable, type)
+                .collectList()
+                .zipWith(countByCriteria(criteria, type))
+                .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
+    }
+
+
+
 
 
 
@@ -128,4 +151,7 @@ public abstract class AbstractReactiveDomainService<T extends Domain<ID>, ID ext
     public Mono<Long> count() {
         return getDao().count();
     }
+
+
+
 }

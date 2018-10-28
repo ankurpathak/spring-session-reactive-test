@@ -22,7 +22,7 @@ public interface IReactiveDomainService<T extends Domain<ID>, ID extends Seriali
 
 
 
-    Flux<T> findPaginated(Pageable pageable);
+    Flux<T> findAll(Pageable pageable);
 
 
 
@@ -34,6 +34,10 @@ public interface IReactiveDomainService<T extends Domain<ID>, ID extends Seriali
     // write
 
 
+    Mono<Page<T>> all(Pageable pageable);
+
+
+    Mono<Page<T>> byCriteria(Criteria criteria, Pageable pageable, Class<T> type);
 
     Mono<T> create(T entity);
 
@@ -65,7 +69,6 @@ public interface IReactiveDomainService<T extends Domain<ID>, ID extends Seriali
     Mono<Void> deleteAll(Iterable<T> domains);
 
     Mono<Void> deleteAll();
-
 
 
 }

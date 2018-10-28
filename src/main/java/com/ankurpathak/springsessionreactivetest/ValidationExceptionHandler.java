@@ -23,11 +23,11 @@ import java.util.List;
 import java.util.Locale;
 
 @RestControllerAdvice
-public class ValidationRestControllerAdvice{
+public class ValidationExceptionHandler {
 
 
 
-    private static final Logger log = LoggerFactory.getLogger(ValidationRestControllerAdvice.class);
+    private static final Logger log = LoggerFactory.getLogger(ValidationExceptionHandler.class);
 
 
     @Autowired
@@ -82,7 +82,7 @@ public class ValidationRestControllerAdvice{
 
 
     @ExceptionHandler({ValidationException.class})
-    public Mono<ResponseEntity<?>> handleValidationException(ValidationException ex, ServerWebExchange exchange) {
+    public ResponseEntity<Mono<?>> handleValidationException(ValidationException ex, ServerWebExchange exchange) {
         log.info("message: {} cause: {}", ex.getMessage(), ex.getCause());
         return handleValidationErrors(ex);
     }
@@ -91,7 +91,7 @@ public class ValidationRestControllerAdvice{
 
 
 
-    private Mono<ResponseEntity<?>> handleValidationErrors(Exception ex) {
+    private ResponseEntity<Mono<?>> handleValidationErrors(Exception ex) {
         String message = null;
         ApiCode code = null;
         BindingResult result = null;
@@ -122,7 +122,7 @@ public class ValidationRestControllerAdvice{
             dto.addExtra("hints", validationErrorDto);
 
         }
-        return Mono.just(ResponseEntity.status(HttpStatus.CONFLICT).body(dto));
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Mono.just(dto));
     }
 
 

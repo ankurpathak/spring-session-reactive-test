@@ -33,6 +33,7 @@ public class ReactiveWebSecurityConfig {
                 .pathMatchers(HttpMethod.GET, RequestMappingPaths.PATH_ROOT).hasAuthority(Role.ROLE_ADMIN)
                 .pathMatchers(HttpMethod.GET, RequestMappingPaths.PATH_FAVICON).permitAll()
                 .pathMatchers(HttpMethod.GET, apiPath(PATH_GET_ME)).hasAuthority(Role.ROLE_ADMIN)
+                .pathMatchers(HttpMethod.GET, apiPath(PATH_GET_USERS)).hasAuthority(Role.ROLE_ADMIN)
                 .anyExchange().denyAll()
                 .and()
                 .csrf().disable()

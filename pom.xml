@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.0.5.RELEASE</version>
+        <version>2.0.6.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -25,6 +25,11 @@
         <valid4j.version>0.5.0</valid4j.version>
         <hamcrest-juit.version>1.0.0.1</hamcrest-juit.version>
         <commons-lang.version>3.8</commons-lang.version>
+        <rsql-query-engine.version>0.7.1</rsql-query-engine.version>
+        <guava.version>26.0-jre</guava.version>
+        <username-validation.version>1.2.1</username-validation.version>
+        <password-validaton.version>1.0.3-SNAPSHOT</password-validaton.version>
+        <primitive-validation.version>1.0-SNAPSHOT</primitive-validation.version>
     </properties>
 
     <dependencies>
@@ -103,6 +108,42 @@
             <artifactId>commons-lang3</artifactId>
             <version>${commons-lang.version}</version>
         </dependency>
+
+        <!-- Google Guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+        <!-- Google Guava -->
+
+        <!-- RSQL Parser -->
+        <dependency>
+            <groupId>com.github.rutledgepaulv</groupId>
+            <artifactId>rest-query-engine</artifactId>
+            <version>${rsql-query-engine.version}</version>
+        </dependency>
+        <!-- RSQL Parser -->
+
+        <!-- Ankur Validation Work -->
+        <dependency>
+            <groupId>com.github.ankurpathak.username</groupId>
+            <artifactId>username-validation</artifactId>
+            <version>${username-validation.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ankurpathak.password</groupId>
+            <artifactId>password-validation</artifactId>
+            <version>${password-validaton.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ankurpathak.primitive</groupId>
+            <artifactId>primitive-validation</artifactId>
+            <version>${primitive-validation.version}</version>
+        </dependency>
+        <!-- Ankur Validation Work -->
+
+
     </dependencies>
 
     <build>

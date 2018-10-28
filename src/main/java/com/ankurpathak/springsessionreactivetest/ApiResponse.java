@@ -3,13 +3,12 @@ package com.ankurpathak.springsessionreactivetest;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class ApiResponse extends DefaultErrorAttributes {
+public class ApiResponse{
 
     private Map<String, Object> extras = new LinkedHashMap<>();
 

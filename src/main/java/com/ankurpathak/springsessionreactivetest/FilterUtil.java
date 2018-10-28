@@ -3,6 +3,7 @@ package com.ankurpathak.springsessionreactivetest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.server.ServerWebExchange;
@@ -17,21 +18,21 @@ public class FilterUtil {
     }
 
 */
-    public static Mono<Void> generateUnauthorized(ServerWebExchange exchange, ObjectMapper objectMapper, MessageSource messageSource, AuthenticationException ex) {
+    public static Mono<Void> generateUnauthorized(ServerWebExchange exchange, Jackson2JsonEncoder encoder, IMessageService messageService, AuthenticationException ex) {
         if (!exchange.getResponse().isCommitted()) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             WebUtil.setContentTypeApplicationJson(exchange.getResponse().getHeaders());
             ApiResponse apiResponse =
                     ApiResponse.getInstance(
                             ApiCode.UNAUTHORIZED,
-                            MessageUtil.getMessage(messageSource, ApiMessages.UNAUTHORIZED)
+                            messageService.getMessage(ApiMessages.UNAUTHORIZED)
                     );
 
             if (ex instanceof DisabledException) {
                 apiResponse =
                         ApiResponse.getInstance(
                                 ApiCode.ACCOUNT_DISABLED,
-                                MessageUtil.getMessage(messageSource, ApiMessages.ACCOUNT_DISABLED)
+                                messageService.getMessage(ApiMessages.ACCOUNT_DISABLED)
                         );
             }
 
@@ -39,7 +40,7 @@ public class FilterUtil {
                     DataBufferUtil.toDataBuffer(
                             apiResponse,
                             ApiResponse.class,
-                            objectMapper
+                            encoder
                     )
             );
 
@@ -51,14 +52,14 @@ public class FilterUtil {
 
 
 
-    public static Mono<Void> generateUnauthorized(ServerWebExchange exchange, ObjectMapper objectMapper, MessageSource messageSource){
-        return generateUnauthorized(exchange, objectMapper, messageSource, null);
+    public static Mono<Void> generateUnauthorized(ServerWebExchange exchange, Jackson2JsonEncoder encoder, IMessageService messageService){
+        return generateUnauthorized(exchange, encoder, messageService, null);
     }
 
 
 
 
-    public static Mono<Void> generateSuccess(ServerWebExchange exchange, ObjectMapper objectMapper, MessageSource messageSource) {
+    public static Mono<Void> generateSuccess(ServerWebExchange exchange, Jackson2JsonEncoder encoder, IMessageService messageService) {
         if (!exchange.getResponse().isCommitted()) {
             exchange.getResponse().setStatusCode(HttpStatus.OK);
             WebUtil.setContentTypeApplicationJson(exchange.getResponse().getHeaders());
@@ -66,10 +67,10 @@ public class FilterUtil {
                     DataBufferUtil.toDataBuffer(
                             ApiResponse.getInstance(
                                     ApiCode.SUCCESS,
-                                    MessageUtil.getMessage(messageSource, ApiMessages.SUCCESS)
+                                    messageService.getMessage(ApiMessages.SUCCESS)
                             ),
                             ApiResponse.class,
-                            objectMapper
+                            encoder
                     )
             );
 
@@ -78,7 +79,7 @@ public class FilterUtil {
         }
     }
 
-    public static Mono<Void> generateForbidden(ServerWebExchange exchange, ObjectMapper objectMapper, MessageSource messageSource) {
+    public static Mono<Void> generateForbidden(ServerWebExchange exchange, Jackson2JsonEncoder encoder, IMessageService messageService) {
         if (!exchange.getResponse().isCommitted()) {
             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
             WebUtil.setContentTypeApplicationJson(exchange.getResponse().getHeaders());
@@ -86,10 +87,10 @@ public class FilterUtil {
                     DataBufferUtil.toDataBuffer(
                             ApiResponse.getInstance(
                                     ApiCode.FORBIDDEN,
-                                    MessageUtil.getMessage(messageSource, ApiMessages.FORBIDDEN)
+                                    messageService.getMessage(ApiMessages.FORBIDDEN)
                             ),
                             ApiResponse.class,
-                            objectMapper
+                            encoder
                     )
             );
 

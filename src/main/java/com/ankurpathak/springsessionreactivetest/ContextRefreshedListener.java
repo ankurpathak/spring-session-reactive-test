@@ -37,8 +37,8 @@ public class ContextRefreshedListener implements ApplicationListener<ContextRefr
 
         System.out.println("Yes I am executing!!!");
 
-        userService.deleteAll();
-      //  roleService.deleteAll();
+        userService.deleteAll().subscribe();
+        roleService.deleteAll().subscribe();
       //  tokenService.deleteAll();
       //  sequenceRepository.deleteAll();
       //  sequenceRepository.insert(Sequence.getUserSequenceInitialValue());
@@ -47,7 +47,7 @@ public class ContextRefreshedListener implements ApplicationListener<ContextRefr
         try{
             for (User user:
                 users ) {
-                userService.create(user);
+                userService.create(user).subscribe();
             }
         }catch (DuplicateKeyException ex){
 
@@ -55,7 +55,7 @@ public class ContextRefreshedListener implements ApplicationListener<ContextRefr
         }
 
         try{
-           roleService.createAll(roles);
+           roleService.createAll(roles).subscribe();
         }catch (DuplicateKeyException ex1){
 
         }

@@ -19,16 +19,14 @@ import static org.springframework.core.ResolvableType.forClass;
 
 public class DataBufferUtil {
 
-    public static <T> Flux<DataBuffer> toDataBuffer(T t, Class<T> type, ObjectMapper objectMapper){
+    public static <T> Flux<DataBuffer> toDataBuffer(T t, Class<T> type, Jackson2JsonEncoder encoder){
         ResolvableType elementType = ResolvableType.forClass(type);
-        Jackson2JsonEncoder encoder = new Jackson2JsonEncoder(objectMapper, MediaType.APPLICATION_JSON);
         DataBufferFactory bufferFactory = new DefaultDataBufferFactory();
         return encoder.encode(Mono.just(t), bufferFactory, elementType, MediaType.APPLICATION_JSON, emptyMap());
     }
 
 
-    public static <T> Mono<T> fromDataBuffer(Flux<DataBuffer> body, Class<T> type, ObjectMapper objectMapper){
-        Jackson2JsonDecoder decoder = new Jackson2JsonDecoder(objectMapper, MediaType.APPLICATION_JSON);
+    public static <T> Mono<T> fromDataBuffer(Flux<DataBuffer> body, Class<T> type, Jackson2JsonDecoder decoder){
         ResolvableType elementType = forClass(type);
         return decoder.decodeToMono(body, elementType, MediaType.APPLICATION_JSON, Collections.emptyMap()).cast(type);
     }

@@ -1,6 +1,6 @@
 package com.ankurpathak.springsessionreactivetest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -13,14 +13,15 @@ import java.util.function.Function;
 public class RestServerLoginAuthenticationConverter implements Function<ServerWebExchange, Mono<Authentication>> {
 
 
-    private final ObjectMapper objectMapper;
+    private final Jackson2JsonDecoder decoder;
 
-    public RestServerLoginAuthenticationConverter(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public RestServerLoginAuthenticationConverter(Jackson2JsonDecoder decoder) {
+        this.decoder = decoder;
     }
 
+
     public Mono<Authentication> apply(ServerWebExchange exchange) {
-        return DataBufferUtil.fromDataBuffer(exchange.getRequest().getBody(), LoginRequestDto.class, objectMapper)
+        return DataBufferUtil.fromDataBuffer(exchange.getRequest().getBody(), LoginRequestDto.class, decoder)
                 .map(this::createAuthentication);
     }
 
