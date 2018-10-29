@@ -11,10 +11,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
@@ -26,6 +28,28 @@ import static com.ankurpathak.springsessionreactivetest.Strings.*;
 
 
 public class ControllerUtil {
+
+
+    public static int fixPage(String page) {
+        int value = PrimitiveUtils.toInteger(page);
+        return value >= 0 ? value : 0;
+    }
+
+
+    public static int fixSize(String size) {
+        int value = PrimitiveUtils.toInteger(size);
+        return value >= 0 ? value : 0;
+    }
+
+
+    public static String contextPath(ServerWebExchange exchange){
+        return exchange.getRequest().getPath().contextPath().value();
+    }
+
+    public static HttpHeaders headers(ServerWebExchange exchange){
+        return exchange.getResponse().getHeaders();
+    }
+
 
     private static void processValidation(BindingResult result, MessageSource messageSource, ApiCode code, String message) {
         if (result.hasErrors()) {
@@ -189,20 +213,14 @@ public class ControllerUtil {
     public static final String PATTERN_END_WITH = "%s$";
     public static final String PATTERN_EXACT = "^%s$";
 
-    public static <T> Mono<Page<T>> pagePostCheck(Page<T> page) {
-        if (page.getPageable().getPageNumber() >= page.getTotalPages())
-            return Mono.error(new NotFoundException(String.valueOf(page.getPageable().getPageNumber()), Params.BLOCK, Page.class.getSimpleName(), ApiCode.PAGE_NOT_FOUND));
-        return Mono.just(page);
+    public static <T> Mono<Page<T>> pagePostCheck(Mono<Page<T>> page) {
+      return page.flatMap(p -> p.getPageable().getPageNumber() >= p.getTotalPages()? Mono.error(new NotFoundException(String.valueOf(p.getPageable().getPageNumber()), Params.BLOCK, Page.class.getSimpleName(), ApiCode.PAGE_NOT_FOUND)): Mono.just(p));
     }
 
 
-    public static Mono<Void> pagePreCheck(Pageable pageable) {
-        if (pageable.getPageNumber() < 0)
-            return Mono.error(new NotFoundException(String.valueOf(pageable.getPageNumber()), Params.BLOCK, Page.class.getSimpleName(), ApiCode.PAGE_NOT_FOUND));
-        return Mono.empty();
+    public static Mono<Pageable> pagePreCheck(Mono<Pageable> pageable) {
+       return pageable.flatMap(p -> p.getPageNumber() < 0 ? Mono.error(new NotFoundException(String.valueOf(p.getPageNumber()), Params.BLOCK, Page.class.getSimpleName(), ApiCode.PAGE_NOT_FOUND)) : Mono.just(p));
     }
-
-
 
 
     public static <T> Criteria parseRSQL(String rsql, Class<T> type) {
