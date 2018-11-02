@@ -1,9 +1,7 @@
 package com.ankurpathak.springsessionreactivetest;
 
-import org.springframework.context.ApplicationEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -39,9 +37,9 @@ public abstract class AbstractRestController<T extends Domain<ID>, ID extends Se
     protected ResponseEntity<Mono<?>> paginated(final Pageable pageable, Class<T> type, UriComponentsBuilder uriBuilder, ServerWebExchange exchange) {
         return ResponseEntity.ok().body(
                 Mono.just(pageable)
-                        .transform(ControllerUtil::pagePreCheck)
+                        .transform(PagingUtil::pagePreCheck)
                         .flatMap(getService()::all)
-                        .transform(ControllerUtil::pagePostCheck)
+                        .transform(PagingUtil::pagePostCheck)
                         .doOnSuccess(p -> {
                             new PaginatedResultsRetrievedEventDiscoverabilityListener().onApplicationEvent(new PaginatedResultsRetrievedEvent(p, uriBuilder, exchange));
 
