@@ -1,7 +1,5 @@
 package com.ankurpathak.springsessionreactivetest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.security.authentication.DisabledException;
@@ -37,7 +35,8 @@ public class FilterUtil {
             }
 
             return exchange.getResponse().writeWith(
-                    DataBufferUtil.toDataBuffer(
+                    MonoUtil.toDataBuffer(
+                            exchange.getResponse().bufferFactory(),
                             apiResponse,
                             ApiResponse.class,
                             encoder
@@ -64,7 +63,8 @@ public class FilterUtil {
             exchange.getResponse().setStatusCode(HttpStatus.OK);
             WebUtil.setContentTypeApplicationJson(exchange.getResponse().getHeaders());
             return exchange.getResponse().writeWith(
-                    DataBufferUtil.toDataBuffer(
+                    MonoUtil.toDataBuffer(
+                            exchange.getResponse().bufferFactory(),
                             ApiResponse.getInstance(
                                     ApiCode.SUCCESS,
                                     messageService.getMessage(ApiMessages.SUCCESS)
@@ -84,7 +84,8 @@ public class FilterUtil {
             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
             WebUtil.setContentTypeApplicationJson(exchange.getResponse().getHeaders());
             return exchange.getResponse().writeWith(
-                    DataBufferUtil.toDataBuffer(
+                    MonoUtil.toDataBuffer(
+                            exchange.getResponse().bufferFactory(),
                             ApiResponse.getInstance(
                                     ApiCode.FORBIDDEN,
                                     messageService.getMessage(ApiMessages.FORBIDDEN)

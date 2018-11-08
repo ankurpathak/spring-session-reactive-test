@@ -21,7 +21,7 @@ public class RestServerLoginAuthenticationConverter implements Function<ServerWe
 
 
     public Mono<Authentication> apply(ServerWebExchange exchange) {
-        return DataBufferUtil.fromDataBuffer(exchange.getRequest().getBody(), LoginRequestDto.class, decoder)
+        return MonoUtil.fromDataBuffer(exchange.getRequest().getBody(), LoginRequestDto.class, decoder)
                 .map(this::createAuthentication);
     }
 

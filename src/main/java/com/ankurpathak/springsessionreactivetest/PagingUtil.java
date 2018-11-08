@@ -63,8 +63,8 @@ public class PagingUtil {
 
         if (Iterables.size(tokens) >= 2) {
             Iterator<String> it = tokens.iterator();
-            String tokenField = org.apache.logging.log4j.util.Strings.EMPTY;
-            String tokenOrder = org.apache.logging.log4j.util.Strings.EMPTY;
+            String tokenField = Strings.EMPTY;
+            String tokenOrder = Strings.EMPTY;
             List<Sort.Order> orders = new ArrayList<>();
             while (it.hasNext()) {
                 tokenField = it.next();
