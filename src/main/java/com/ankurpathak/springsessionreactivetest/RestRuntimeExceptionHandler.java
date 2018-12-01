@@ -25,19 +25,30 @@ class RestRuntimeExceptionHandler {
 
     @ExceptionHandler({NotFoundException.class})
     public ResponseEntity<Mono<?>> handleNotFoundException(NotFoundException ex) {
-        log.info("message: {} cause: {}", ex.getMessage(), ex.getCause());
+        log.error("{} message: {} cause: {}",ex.getClass().getSimpleName(),  ex.getMessage(), ex.getCause());
         ex.printStackTrace();
+        return generateExceptionApiResponse(HttpStatus.NOT_FOUND, ex.getCode(), ApiMessages.NOT_FOUND,ex.getEntity(), ex.getProperty(), ex.getId());
+    }
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+    @ExceptionHandler({FoundException.class})
+    public ResponseEntity<Mono<?>> handleFoundException(FoundException ex){
+        log.error("{} message: {} cause: {}",ex.getClass().getSimpleName(),  ex.getMessage(), ex.getCause());
+        ex.printStackTrace();
+        return generateExceptionApiResponse(HttpStatus.CONFLICT, ex.getCode(), ApiMessages.NOT_FOUND, ex.getEntity(), ex.getProperty(), ex.getId());
+    }
+
+
+
+    private ResponseEntity<Mono<?>> generateExceptionApiResponse(HttpStatus status, ApiCode code, String apiMessage, String... args){
+        return ResponseEntity.status(status)
                 .body(
                         Mono.just(
                                 ApiResponse.getInstance(
-                                        ex.getCode(),
-                                        messageService.getMessage(ApiMessages.NOT_FOUND, ex.getEntity(), ex.getProperty(), ex.getId())
+                                        code,
+                                        messageService.getMessage(ApiMessages.NOT_FOUND, args)
                                 )
                         )
                 );
-
     }
 
 

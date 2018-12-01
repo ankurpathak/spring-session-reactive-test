@@ -11,13 +11,13 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 @JsonInclude(Include.NON_EMPTY)
-@Document(collection = DocumentCollections.TOKEN)
+@Document(collection = Documents.TOKEN)
 public class Token extends Domain<String> implements Serializable {
 
-    @Indexed(name = DocumentCollections.Index.TOKEN_VALUE_IDX, unique = true, sparse = true)
+    @Indexed(name = Documents.Index.TOKEN_VALUE_IDX, unique = true, sparse = true)
     private String value;
 
-    @Indexed(name = DocumentCollections.Index.TOKEN_EXPIRY_IDX, expireAfterSeconds= EXPIRATION_IN_SECONDS)
+    @Indexed(name = Documents.Index.TOKEN_EXPIRY_IDX, expireAfterSeconds= EXPIRATION_IN_SECONDS)
     private Instant expiry;
     private static final int EXPIRATION_IN_MINUTES = 30;
 
@@ -48,9 +48,10 @@ public class Token extends Domain<String> implements Serializable {
         return new Token();
     }
 
-    public final void updateToken(String token) {
+    public Token updateToken(String token) {
         this.value = token;
         this.expiry = this.calculateExpiryDate(EXPIRATION_IN_MINUTES);
+        return this;
     }
 
 
@@ -59,6 +60,10 @@ public class Token extends Domain<String> implements Serializable {
         this.expiry = this.calculateExpiryDate(EXPIRATION_IN_MINUTES);
     }
 
+    @Override
+    public String resourcePath() {
+        return Documents.TOKEN;
+    }
 
 
     public enum TokenStatus {

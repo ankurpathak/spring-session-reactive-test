@@ -8,7 +8,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 
 
 import static com.ankurpathak.springsessionreactivetest.RequestMappingPaths.*;
@@ -16,7 +15,7 @@ import static com.ankurpathak.springsessionreactivetest.RequestMappingPaths.*;
 public class ReactiveWebSecurityConfig {
 
     @Autowired
-    private AuthenticationWebFilter authenticationWebFilter;
+    private FilterConfig filterConfig;
 
     @Autowired
     private RestServerAuthenticationEntryPoint authenticationEntryPoint;
@@ -25,11 +24,13 @@ public class ReactiveWebSecurityConfig {
     @Autowired
     private RestServerAccessDeniedHandler accessDeniedHandler;
 
-
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         http
                 .authorizeExchange()
+                .pathMatchers(HttpMethod.GET, "/").permitAll()
+                .pathMatchers(HttpMethod.POST, "/").permitAll()
+                .pathMatchers(HttpMethod.POST, apiPath(PATH_ACCOUNT)).permitAll()
                 .pathMatchers(HttpMethod.GET, RequestMappingPaths.PATH_ROOT).hasAuthority(Role.ROLE_ADMIN)
                 .pathMatchers(HttpMethod.GET, RequestMappingPaths.PATH_FAVICON).permitAll()
                 .pathMatchers(HttpMethod.GET, apiPath(PATH_GET_ME)).hasAuthority(Role.ROLE_ADMIN)
@@ -37,7 +38,8 @@ public class ReactiveWebSecurityConfig {
                 .anyExchange().denyAll()
                 .and()
                 .csrf().disable()
-                .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+                .addFilterAt(filterConfig.domainContextWebFilter(), SecurityWebFiltersOrder.REACTOR_CONTEXT)
+                .addFilterAt(filterConfig.authenticationWebFilter(), SecurityWebFiltersOrder.FORM_LOGIN)
                 .exceptionHandling()
                 .authenticationEntryPoint(authenticationEntryPoint)
                 .accessDeniedHandler(accessDeniedHandler)

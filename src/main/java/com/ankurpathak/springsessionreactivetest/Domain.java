@@ -37,6 +37,8 @@ abstract public class Domain<T> implements Serializable {
         return this;
     }
 
+    public abstract String resourcePath();
+
 
 
 }

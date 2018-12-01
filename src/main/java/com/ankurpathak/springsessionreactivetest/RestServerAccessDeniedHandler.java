@@ -17,6 +17,6 @@ public class RestServerAccessDeniedHandler implements ServerAccessDeniedHandler 
 
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, AccessDeniedException ex) {
-        return filterService.generateForbidden(exchange);
+        return filterService.generateForbidden(exchange, ex);
     }
 }

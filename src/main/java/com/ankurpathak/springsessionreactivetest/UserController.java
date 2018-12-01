@@ -1,9 +1,11 @@
 package com.ankurpathak.springsessionreactivetest;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -18,8 +20,8 @@ public class UserController extends AbstractRestController<User, BigInteger, Use
 
     private final IReactiveUserService service;
 
-    public UserController(IReactiveUserService service, IMessageService messageService) {
-        super(messageService);
+    public UserController(ApplicationContext applicationContext, IControllerService controllerService, IReactiveUserService service) {
+        super(applicationContext, controllerService);
         this.service = service;
     }
 
@@ -36,6 +38,9 @@ public class UserController extends AbstractRestController<User, BigInteger, Use
         Pageable pageable = PagingUtil.getPageable(PagingUtil.fixPage(page), PagingUtil.fixSize(size), sort);
         return paginated(pageable, User.class, uriBuilder, exchange);
     }
+
+
+
 
 
 

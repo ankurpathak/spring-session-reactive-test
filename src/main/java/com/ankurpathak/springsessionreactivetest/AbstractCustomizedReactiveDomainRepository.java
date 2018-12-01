@@ -11,12 +11,16 @@ import java.io.Serializable;
 
 public abstract class AbstractCustomizedReactiveDomainRepository<T extends Domain<ID>, ID extends Serializable> implements ICustomizedReactiveDomainRepository<T, ID> {
 
-    abstract public ReactiveMongoTemplate getTemplate();
+    protected final ReactiveMongoTemplate template;
+
+    protected AbstractCustomizedReactiveDomainRepository(ReactiveMongoTemplate template) {
+        this.template = template;
+    }
 
 
     @Override
     public Flux<T> findByCriteria(Criteria criteria, Pageable pageable, Class<T> type) {
-        return getTemplate().find(
+        return template.find(
                 new Query().with(pageable).addCriteria(criteria),
                 type
         );
@@ -25,7 +29,7 @@ public abstract class AbstractCustomizedReactiveDomainRepository<T extends Domai
 
     @Override
     public Mono<Long> countByCriteria(Criteria criteria, Class<T> type) {
-        return getTemplate().count(
+        return template.count(
             new Query().addCriteria(criteria),
             type
         );

@@ -1,5 +1,6 @@
 package com.ankurpathak.springsessionreactivetest;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -11,46 +12,50 @@ import reactor.core.publisher.Mono;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class CustomReactiveUserDetailsService implements ReactiveUserDetailsService {
 
     public static final String USERNAME_NOT_FOUND_MESSAGE = "Username %s not found.";
-    private final IReactiveUserRepository userRepository;
+    private final IReactiveUserService userService;
 
-    public CustomReactiveUserDetailsService(IReactiveUserRepository userRepository) {
-        this.userRepository = userRepository;
+    public CustomReactiveUserDetailsService(IReactiveUserService userService) {
+        this.userService = userService;
     }
 
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
-        List<Criteria> criteriaList = new ArrayList<>();
-        if (!StringUtils.isNumeric(username)) {
-            criteriaList.add(Criteria.where("email.value").is(username));
-            criteriaList.add(Criteria.where("username").is(username));
-        } else {
-            criteriaList.add(Criteria.where("_id").is(PrimitiveUtils.toBigInteger(username)));
-            criteriaList.add(Criteria.where("contact.value").is(username));
-            /*
-            SecurityUtil.getDomainContext()
-                    .map(DomainContext::getRemoteAddress)
-                    .flatMap(ipService::ipToCountryAlphaCode)
-                    .map(countryService::alphaCodeToCallingCodes)
-                    .ifPresent(callingCodes -> {
-                        callingCodes.stream()
-                                .map(callingCode->String.format("+%s%s",callingCode, username))
-                                .forEach(contact -> criteriaList.add(Criteria.where("contact.value").is(contact)));
-                    });
-                    */
-        }
-
-        Criteria criteria = new Criteria().orOperator(criteriaList.toArray(new Criteria[]{}));
-        return userRepository.findByCriteria(criteria, PageRequest.of(0, 1), User.class)
+        return userService.possibleCandidateKeys(username)
+                .flatMapIterable(Map::entrySet)
+                .map(entry -> Criteria.where(KEY_MAPPINGS.get(entry.getKey())).is(entry.getValue()))
+                .mergeWith(userService.possibleContacts(username).map(contact -> Criteria.where(KEY_CONTACT).is(contact)))
+                .collectList()
+                .filter(CollectionUtils::isNotEmpty)
+                .map(criteriaList -> new Criteria().orOperator(criteriaList.toArray(new Criteria[]{})))
+                .flatMapMany(criteria -> userService.findByCriteria(criteria, PageRequest.of(0, 1), User.class))
                 .next()
-                .switchIfEmpty(Mono.error(new UsernameNotFoundException(String.format(USERNAME_NOT_FOUND_MESSAGE,username))))
+                .switchIfEmpty(Mono.error(new UsernameNotFoundException(String.format(USERNAME_NOT_FOUND_MESSAGE, username))))
                 .map(CustomUserDetails::new);
+    }
+
+
+    public static final String KEY_EMAIL = "email.value";
+    public static final String KEY_CONTACT = "contact.value";
+    public static final String KEY_USERNAME = "username";
+    public static final String KEY_ID = "_id";
+
+
+    public static final Map<String, String> KEY_MAPPINGS = new LinkedHashMap<>();
+
+    static {
+        KEY_MAPPINGS.put(Params.ID, KEY_ID);
+        KEY_MAPPINGS.put(Params.USERNAME, KEY_USERNAME);
+        KEY_MAPPINGS.put(Params.EMAIL, KEY_EMAIL);
+        KEY_MAPPINGS.put(Params.CONTACT, KEY_CONTACT);
     }
 
 

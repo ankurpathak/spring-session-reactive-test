@@ -9,10 +9,10 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-@Document(collection = DocumentCollections.ROLE)
+@Document(collection = Documents.ROLE)
 public class Role extends Domain<String> implements Serializable {
 
-    @Indexed(name = DocumentCollections.Index.ROLE_NAME_IDX, unique = true, sparse = true)
+    @Indexed(name = Documents.Index.ROLE_NAME_IDX, unique = true, sparse = true)
     private String name;
     private Set<String> privileges;
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
@@ -34,6 +34,11 @@ public class Role extends Domain<String> implements Serializable {
     public Role id(String id) {
         super.id(id);
         return this;
+    }
+
+    @Override
+    public String resourcePath() {
+        return Documents.ROLE;
     }
 
 

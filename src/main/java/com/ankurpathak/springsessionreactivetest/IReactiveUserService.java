@@ -1,9 +1,18 @@
 package com.ankurpathak.springsessionreactivetest;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 import java.math.BigInteger;
+import java.util.Map;
 import java.util.Optional;
 
 public interface IReactiveUserService extends IReactiveDomainService<User, BigInteger> {
+    Mono<Map<String, Object>> possibleCandidateKeys(String username);
+
+    Flux<String> possibleContacts(String username);
+
+    Mono<User> byEmail(String email);
 
     /*
 

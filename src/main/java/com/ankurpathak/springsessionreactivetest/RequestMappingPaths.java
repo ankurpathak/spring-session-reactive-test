@@ -18,6 +18,12 @@ public interface RequestMappingPaths {
     String PATH_INDEX = "index";
     String PATH_FAVICON = "/favicon.ico";
 
+    String PATH_ACCOUNT = "/account";
+
+    String PATH_ACCOUNT_EMAIL = "/account/email/{email}";
+
+
+
 
     static String apiPath(String path){
         return Paths.get(PATH_API, path).toString();

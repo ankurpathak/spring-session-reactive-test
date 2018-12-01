@@ -83,7 +83,7 @@ public class ValidationExceptionHandler {
 
     @ExceptionHandler({ValidationException.class})
     public ResponseEntity<Mono<?>> handleValidationException(ValidationException ex, ServerWebExchange exchange) {
-        log.info("message: {} cause: {}", ex.getMessage(), ex.getCause());
+        log.error("{} message: {} cause: {}",ex.getClass().getSimpleName(),  ex.getMessage(), ex.getCause());
         return handleValidationErrors(ex);
     }
 
