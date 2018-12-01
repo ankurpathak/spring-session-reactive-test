@@ -8,12 +8,10 @@ public class ReactiveRoleService extends AbstractReactiveDomainService<Role, Str
     private final IReactiveRoleRepository dao;
 
     public ReactiveRoleService(IReactiveRoleRepository dao) {
+        super(dao);
         this.dao = dao;
      }
 
 
-    @Override
-    protected ExtendedReactiveMongoRepository<Role, String> getDao() {
-        return dao;
-    }
+
 }

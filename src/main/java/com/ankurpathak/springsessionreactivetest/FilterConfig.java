@@ -1,35 +1,40 @@
 package com.ankurpathak.springsessionreactivetest;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 
 @Configuration
 public class FilterConfig {
 
 
-    @Autowired
-    private ReactiveAuthenticationManager authenticationManager;
-    @Autowired
-    private RestServerLoginAuthenticationConverter authenticationConverter;
-    @Autowired
-    private RestServerAuthenticationFailureHandler authenticationFailureHandler;
-    @Autowired
-    private RestServerAuthenticationSuccessHandler authenticationSuccessHandler;
+    private final ReactiveAuthenticationManager authenticationManager;
+    private final RestServerLoginAuthenticationConverter authenticationConverter;
+    private final RestServerAuthenticationFailureHandler authenticationFailureHandler;
+    private final RestServerAuthenticationSuccessHandler authenticationSuccessHandler;
 
-    @Bean
-    @Lazy
-    public AuthenticationWebFilter authenticationWebFilter(){
+    public FilterConfig(ReactiveAuthenticationManager authenticationManager, RestServerLoginAuthenticationConverter authenticationConverter, RestServerAuthenticationFailureHandler authenticationFailureHandler, RestServerAuthenticationSuccessHandler authenticationSuccessHandler) {
+        this.authenticationManager = authenticationManager;
+        this.authenticationConverter = authenticationConverter;
+        this.authenticationFailureHandler = authenticationFailureHandler;
+        this.authenticationSuccessHandler = authenticationSuccessHandler;
+    }
+
+    protected AuthenticationWebFilter authenticationWebFilter(){
         AuthenticationWebFilter filter = new AuthenticationWebFilter(authenticationManager);
-        filter.setAuthenticationConverter(authenticationConverter);
+        filter.setServerAuthenticationConverter(authenticationConverter);
         filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
         filter.setAuthenticationFailureHandler(authenticationFailureHandler);
         filter.setSecurityContextRepository(new WebSessionServerSecurityContextRepository());
+        filter.setRequiresAuthenticationMatcher(ServerWebExchangeMatchers.pathMatchers("/login"));
         return  filter;
+    }
+
+
+    protected DomainContextWebFilter domainContextWebFilter(){
+        return new DomainContextWebFilter();
     }
 
 }

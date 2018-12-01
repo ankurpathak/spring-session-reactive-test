@@ -1,25 +1,21 @@
 package com.ankurpathak.springsessionreactivetest;
 
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
+import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
 public class SecurityUtil {
-    public static Optional<User> getMe() {
-        return getMe(getAuthentication().orElse(null));
+    public static Mono<User> getMe() {
+        return getCustomUserDetails().map(CustomUserDetails::getUser);
     }
 
 
 
-    public static Optional<User> getMe(Authentication authentication){
-        Optional<CustomUserDetails> userContext = getCustomUserDetails(authentication);
-        if (userContext.isPresent() && userContext.get().getUser() != null) {
-            return Optional.of(userContext.get().getUser());
-        }
-        return Optional.empty();
-    }
+
 
 
 
@@ -49,51 +45,34 @@ public class SecurityUtil {
     */
 
 
-    /*
-
-    public static Optional<DomainContext> getDomainContext() {
-        return getSecurityContext().map(SecurityContextCompositeImpl::getDomainContext);
-    }*/
-
-
-
-
-    public static Optional<Authentication> getAuthentication() {
-        return getAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    }
-
-    public static Optional<Authentication> getAuthentication(Authentication authentication){
-        if (authentication!= null) {
-            return Optional.of(authentication);
-        }
-        return Optional.empty();
-    }
-
-    public static Optional<CustomUserDetails> getCustomUserDetails() {
-        return getCustomUserDetails(getAuthentication().orElse(null));
+    public static Mono<DomainContext> getDomainContext() {
+        return ReactiveDomainContextHolder.getContext();
     }
 
 
 
-    public static Optional<CustomUserDetails> getCustomUserDetails(Authentication authentication) {
-        if(authentication!= null){
-            if(authentication.getPrincipal() != null && authentication.getPrincipal() instanceof CustomUserDetails){
-                return Optional.of((CustomUserDetails)authentication.getPrincipal());
-            }
-        }
-        return Optional.empty();
+
+    public static Mono<Authentication> getAuthentication() {
+        return getSecurityContext().map(SecurityContextImpl::getAuthentication);
     }
 
 
-    /*
 
-    public static Optional<SecurityContextCompositeImpl> getSecurityContext() {
-        SecurityContext context = SecurityContextHolder.getContext();
-        if(context!= null && context instanceof SecurityContextCompositeImpl){
-            return Optional.of((SecurityContextCompositeImpl) context);
-        }
-        return Optional.empty();
-    } *
+    public static Mono<CustomUserDetails> getCustomUserDetails() {
+        return getAuthentication()
+                .map(Authentication::getPrincipal)
+                .ofType(CustomUserDetails.class);
+    }
+
+
+
+
+
+    public static Mono<ExtendedSecurityContextImpl> getSecurityContext() {
+        return ReactiveSecurityContextHolder.getContext()
+                .filter(ExtendedSecurityContextImpl.class::isInstance)
+                .map(ExtendedSecurityContextImpl.class::cast);
+    }
 
 
 
@@ -154,4 +133,6 @@ public class SecurityUtil {
     }
 
     */
+
+
 }

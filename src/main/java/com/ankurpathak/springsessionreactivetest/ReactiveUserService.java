@@ -1,30 +1,43 @@
 package com.ankurpathak.springsessionreactivetest;
 
+import com.github.ankurpathak.primitive.bean.constraints.string.StringValidator;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.math.BigInteger;
+import java.util.*;
+
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.not;
+import static org.valid4j.Assertive.require;
 
 @Service
 public class ReactiveUserService extends AbstractReactiveDomainService<User,BigInteger> implements IReactiveUserService {
 
     private final IReactiveUserRepository dao;
+    private final IpService ipService;
+    private final ICountryService countryService;
   //  private final ITokenService tokenService;
  //   private final IEmailService emailService;
 
-    public ReactiveUserService(IReactiveUserRepository dao
+    public ReactiveUserService(IReactiveUserRepository dao,
                                //, ITokenService tokenService, IEmailService emailService
-                       ) {
+                               IpService ipService, ICountryService countryService) {
+        super(dao);
         this.dao = dao;
-       // this.tokenService = tokenService;
+        this.ipService = ipService;
+        // this.tokenService = tokenService;
       //  this.emailService = emailService;
+        this.countryService = countryService;
     }
 
 
 
-    @Override
-    protected ExtendedReactiveMongoRepository<User,BigInteger> getDao() {
-        return dao;
-    }
 
     /*
     @Override
@@ -165,4 +178,50 @@ public class ReactiveUserService extends AbstractReactiveDomainService<User,BigI
     }
 
     */
+
+
+    @Override
+    public Mono<Map<String, Object>> possibleCandidateKeys(String username) {
+        if (StringUtils.isEmpty(username))
+            return Mono.empty();
+        Map<String, Object> possibleKeys = new LinkedHashMap<>();
+
+        if (StringValidator.email(username, false))
+            possibleKeys.put(Params.EMAIL, username);
+        else if (StringValidator.contact(username, false))
+            possibleKeys.put(Params.CONTACT, username);
+
+        BigInteger possibleId = PrimitiveUtils.toBigInteger(username);
+        if (possibleId.compareTo(BigInteger.ZERO) > 0) {
+            possibleKeys.put(Params.ID, possibleId);
+        }
+        possibleKeys.put(Params.USERNAME, username);
+        return Mono.just(possibleKeys);
+    }
+
+
+    @Override
+    public Flux<String> possibleContacts(String username) {
+        require(username, not(emptyString()));
+        if (!StringUtils.isNumeric(username))
+            return Flux.empty();
+        return SecurityUtil.getDomainContext()
+                .doOnSuccess(System.out::println)
+               .flatMap(DomainContext::getIp)
+                .doOnSuccess(System.out::println)
+                .flatMap(ipService::ipToCountryAlphaCode)
+                .flatMapMany(countryService::alphaCodeToCallingCodes)
+                .map(callingCode -> String.format("+%s%s", callingCode, username));
+
+    }
+
+
+    @Override
+    public Mono<User> byEmail(String email) {
+        require(email, not(emptyString()));
+        return dao.findByCriteria(Criteria.where(Documents.User.QueryKeys.EMAIL).is(email), PageRequest.of(0,1), User.class)
+                .next();
+    }
+
+
 }

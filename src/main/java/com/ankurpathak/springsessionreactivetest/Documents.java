@@ -1,6 +1,6 @@
 package com.ankurpathak.springsessionreactivetest;
 
-public interface DocumentCollections {
+public interface Documents {
 
     String USER = "users";
     String ROLE = "roles";
@@ -28,4 +28,61 @@ public interface DocumentCollections {
         public static final String FIELD_CURRENT = "curr";
 
     }
+
+
+    interface User {
+
+        interface Field {
+
+        }
+
+        interface Index {
+
+        }
+
+        interface Query {
+
+        }
+
+
+        interface QueryKeys{
+            String EMAIL = "email.value";
+        }
+
+    }
+
+
+    interface Role {
+
+        interface Field {
+
+        }
+
+        interface Index {
+
+        }
+
+        interface Query {
+
+        }
+
+    }
+
+
+    interface Token {
+
+        interface Field {
+
+        }
+
+        interface Index {
+
+        }
+
+        interface Query {
+
+        }
+
+    }
+
 }

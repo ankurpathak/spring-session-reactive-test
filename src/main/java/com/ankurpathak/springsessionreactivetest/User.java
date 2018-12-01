@@ -17,11 +17,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-@Document(collection = DocumentCollections.USER)
+@Document(collection = Documents.USER)
 @CompoundIndexes({
-        @CompoundIndex(name = DocumentCollections.Index.USER_EMAIL_IDX, sparse = true, unique = true, def = DocumentCollections.Index.USER_EMAIL_IDX_DEF),
-        @CompoundIndex(name = DocumentCollections.Index.USER_CONTACT_IDX, sparse = true, unique = true, def = DocumentCollections.Index.USER_CONTACT_IDX_DEF),
-        @CompoundIndex(name = DocumentCollections.Index.USER_EMAIL_TOKEN_ID_IDX, sparse = true, unique = true, def = DocumentCollections.Index.USER_EMAIL_TOKEN_ID_IDX_DEF)
+        @CompoundIndex(name = Documents.Index.USER_EMAIL_IDX, sparse = true, unique = true, def = Documents.Index.USER_EMAIL_IDX_DEF),
+        @CompoundIndex(name = Documents.Index.USER_CONTACT_IDX, sparse = true, unique = true, def = Documents.Index.USER_CONTACT_IDX_DEF),
+        @CompoundIndex(name = Documents.Index.USER_EMAIL_TOKEN_ID_IDX, sparse = true, unique = true, def = Documents.Index.USER_EMAIL_TOKEN_ID_IDX_DEF)
 })
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class User extends ExtendedDomain<BigInteger> implements Serializable {
@@ -30,7 +30,7 @@ public class User extends ExtendedDomain<BigInteger> implements Serializable {
     private String firstName;
     private String lastName;
     private Contact email;
-    @Indexed(name = DocumentCollections.Index.USER_USERNAME_IDX, unique = true, sparse = true)
+    @Indexed(name = Documents.Index.USER_USERNAME_IDX, unique = true, sparse = true)
     private String username;
     private Contact contact;
     private Set<String> roles;
@@ -162,6 +162,11 @@ public class User extends ExtendedDomain<BigInteger> implements Serializable {
     public User id(BigInteger id) {
         super.id(id);
         return this;
+    }
+
+    @Override
+    public String resourcePath() {
+        return Documents.USER;
     }
 
     @JsonView({View.Public.class, View.Me.class})

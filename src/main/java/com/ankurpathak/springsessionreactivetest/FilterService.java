@@ -1,6 +1,7 @@
 package com.ankurpathak.springsessionreactivetest;
 
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
@@ -21,10 +22,7 @@ public class FilterService implements IFilterService {
         return FilterUtil.generateUnauthorized(exchange, jsonEncoder, messageService, ex);
     }
 
-    @Override
-    public Mono<Void> generateUnauthorized(ServerWebExchange exchange) {
-        return FilterUtil.generateUnauthorized(exchange, jsonEncoder, messageService);
-    }
+
 
     @Override
     public Mono<Void> generateSuccess(ServerWebExchange exchange) {
@@ -32,7 +30,7 @@ public class FilterService implements IFilterService {
     }
 
     @Override
-    public Mono<Void> generateForbidden(ServerWebExchange exchange) {
-        return FilterUtil.generateForbidden(exchange, jsonEncoder, messageService);
+    public Mono<Void> generateForbidden(ServerWebExchange exchange, AccessDeniedException ex) {
+        return FilterUtil.generateForbidden(exchange, jsonEncoder, messageService, ex);
     }
 }

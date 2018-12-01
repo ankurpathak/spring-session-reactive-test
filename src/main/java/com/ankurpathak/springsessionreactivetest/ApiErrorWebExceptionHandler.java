@@ -33,7 +33,7 @@ public class ApiErrorWebExceptionHandler extends AbstractErrorWebExceptionHandle
 
     private Mono<ServerResponse> renderErrorResponse(final ServerRequest request) {
 
-        final Map<String, Object> errorPropertiesMap = getErrorAttributes(request, false);
+        final Map<String, Object> errorPropertiesMap = getErrorAttributes(request, true);
         ApiResponse apiResponse = ApiResponse.getInstance(ApiCode.UNKNOWN, ApiMessages.UNKNOWN)
                 .addExtras(errorPropertiesMap);
 

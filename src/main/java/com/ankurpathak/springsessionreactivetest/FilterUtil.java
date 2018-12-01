@@ -1,94 +1,60 @@
 package com.ankurpathak.springsessionreactivetest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+
 public class FilterUtil {
 
-    /*
+    private FilterUtil(){}
 
-    public static void generateForbidden(ServerHttpRequest request,  response, ObjectMapper objectMapper, MessageSource messageSource) throws IOException{
-        generateUnauthorized(request, response, objectMapper, messageSource, null);
-    }
 
-*/
+    private static final Logger log = LoggerFactory.getLogger(FilterUtil.class);
+
+
+
     public static Mono<Void> generateUnauthorized(ServerWebExchange exchange, Jackson2JsonEncoder encoder, IMessageService messageService, AuthenticationException ex) {
-        if (!exchange.getResponse().isCommitted()) {
-            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-            WebUtil.setContentTypeApplicationJson(exchange.getResponse().getHeaders());
-            ApiResponse apiResponse =
-                    ApiResponse.getInstance(
-                            ApiCode.UNAUTHORIZED,
-                            messageService.getMessage(ApiMessages.UNAUTHORIZED)
-                    );
-
-            if (ex instanceof DisabledException) {
-                apiResponse =
-                        ApiResponse.getInstance(
-                                ApiCode.ACCOUNT_DISABLED,
-                                messageService.getMessage(ApiMessages.ACCOUNT_DISABLED)
-                        );
-            }
-
-            return exchange.getResponse().writeWith(
-                    MonoUtil.toDataBuffer(
-                            exchange.getResponse().bufferFactory(),
-                            apiResponse,
-                            ApiResponse.class,
-                            encoder
-                    )
-            );
-
-
-        } else {
-            return Mono.empty();
+        log.error("{} message: {} cause: {}",ex.getClass().getSimpleName(),  ex.getMessage(), ex.getCause());
+        ex.printStackTrace();
+        if (ex instanceof DisabledException) {
+            return generateApiResponse(exchange, encoder, messageService, HttpStatus.UNAUTHORIZED, ApiCode.ACCOUNT_DISABLED, ApiMessages.ACCOUNT_DISABLED);
+        }else {
+            return generateApiResponse(exchange, encoder, messageService, HttpStatus.UNAUTHORIZED, ApiCode.UNAUTHORIZED, ApiMessages.UNAUTHORIZED);
         }
     }
 
-
-
-    public static Mono<Void> generateUnauthorized(ServerWebExchange exchange, Jackson2JsonEncoder encoder, IMessageService messageService){
-        return generateUnauthorized(exchange, encoder, messageService, null);
-    }
 
 
 
 
     public static Mono<Void> generateSuccess(ServerWebExchange exchange, Jackson2JsonEncoder encoder, IMessageService messageService) {
-        if (!exchange.getResponse().isCommitted()) {
-            exchange.getResponse().setStatusCode(HttpStatus.OK);
-            WebUtil.setContentTypeApplicationJson(exchange.getResponse().getHeaders());
-            return exchange.getResponse().writeWith(
-                    MonoUtil.toDataBuffer(
-                            exchange.getResponse().bufferFactory(),
-                            ApiResponse.getInstance(
-                                    ApiCode.SUCCESS,
-                                    messageService.getMessage(ApiMessages.SUCCESS)
-                            ),
-                            ApiResponse.class,
-                            encoder
-                    )
-            );
-
-        } else {
-            return Mono.empty();
-        }
+        return generateApiResponse(exchange, encoder, messageService, HttpStatus.OK, ApiCode.SUCCESS, ApiMessages.SUCCESS);
     }
 
-    public static Mono<Void> generateForbidden(ServerWebExchange exchange, Jackson2JsonEncoder encoder, IMessageService messageService) {
+    public static Mono<Void> generateForbidden(ServerWebExchange exchange, Jackson2JsonEncoder encoder, IMessageService messageService, AccessDeniedException ex) {
+        log.error("{} message: {} cause: {}",ex.getClass().getSimpleName(),  ex.getMessage(), ex.getCause());
+        ex.printStackTrace();
+        return generateApiResponse(exchange, encoder, messageService, HttpStatus.FORBIDDEN, ApiCode.FORBIDDEN, ApiMessages.FORBIDDEN);
+    }
+
+
+    private static Mono<Void> generateApiResponse(ServerWebExchange exchange, Jackson2JsonEncoder encoder, IMessageService messageService, HttpStatus status, ApiCode code, String message){
         if (!exchange.getResponse().isCommitted()) {
-            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+            exchange.getResponse().setStatusCode(status);
             WebUtil.setContentTypeApplicationJson(exchange.getResponse().getHeaders());
             return exchange.getResponse().writeWith(
                     MonoUtil.toDataBuffer(
                             exchange.getResponse().bufferFactory(),
                             ApiResponse.getInstance(
-                                    ApiCode.FORBIDDEN,
-                                    messageService.getMessage(ApiMessages.FORBIDDEN)
+                                    code,
+                                    messageService.getMessage(message)
                             ),
                             ApiResponse.class,
                             encoder

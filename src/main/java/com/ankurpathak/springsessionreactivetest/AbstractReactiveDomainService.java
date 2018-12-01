@@ -10,47 +10,53 @@ import reactor.core.publisher.Mono;
 import java.io.Serializable;
 
 import static org.hamcrest.Matchers.*;
-import static org.valid4j.Assertive.ensure;
+import static org.valid4j.Assertive.require;
 
 public abstract class AbstractReactiveDomainService<T extends Domain<ID>, ID extends Serializable> implements IReactiveDomainService<T, ID> {
+
+    private final ExtendedReactiveMongoRepository<T,ID> dao;
+
+    protected AbstractReactiveDomainService(ExtendedReactiveMongoRepository<T, ID> dao) {
+        this.dao = dao;
+    }
+
     @Override
     public Mono<T> findById(final ID id) {
-        ensure(id, notNullValue());
-        return getDao().findById(id);
+        require(id, notNullValue());
+        return dao.findById(id);
     }
 
 
     @Override
     public Flux<T> findAll() {
-        return getDao().findAll();
+        return dao.findAll();
     }
 
     @Override
     public Mono<Long> countByCriteria(Criteria criteria, Class<T> type) {
-        ensure(criteria, notNullValue());
-        ensure(type, notNullValue());
-        return getDao().countByCriteria(criteria, type);
+        require(criteria, notNullValue());
+        require(type, notNullValue());
+        return dao.countByCriteria(criteria, type);
     }
 
-    protected abstract ExtendedReactiveMongoRepository<T, ID> getDao();
 
 
 
 
     @Override
     public Flux<T> findByCriteria(final Criteria criteria, final Pageable pageable, Class<T> type) {
-        ensure(criteria, notNullValue());
-        ensure(pageable, notNullValue());
-        ensure(type, notNullValue());
-        return getDao().findByCriteria(criteria,pageable, type);
+        require(criteria, notNullValue());
+        require(pageable, notNullValue());
+        require(type, notNullValue());
+        return dao.findByCriteria(criteria,pageable, type);
     }
 
 
 
     @Override
     public Flux<T> findAll(final Pageable pageable) {
-        ensure(pageable, notNullValue());
-        return getDao().findAll(pageable);
+        require(pageable, notNullValue());
+        return dao.findAll(pageable);
     }
 
 
@@ -78,32 +84,32 @@ public abstract class AbstractReactiveDomainService<T extends Domain<ID>, ID ext
 
     @Override
     public Mono<T> create(T entity) {
-        ensure(entity, notNullValue());
-        return getDao().insert(entity);
+        require(entity, notNullValue());
+        return dao.insert(entity);
     }
 
     @Override
     public Mono<T> update(T entity) {
-        ensure(entity, notNullValue());
-        return getDao().save(entity);
+        require(entity, notNullValue());
+        return dao.save(entity);
     }
 
     @Override
     public Flux<T> createAll(Iterable<T> entities) {
-        ensure(entities, not(empty()));
-        return getDao().insert(entities);
+        require(entities, not(empty()));
+        return dao.insert(entities);
     }
 
     @Override
     public Mono<Void> delete(final T entity) {
-        ensure(entity, notNullValue());
-        return getDao().delete(entity);
+        require(entity, notNullValue());
+        return dao.delete(entity);
     }
 
     @Override
     public Mono<Void> deleteById(ID id) {
-        ensure(id, notNullValue());
-        return getDao().deleteById(id);
+        require(id, notNullValue());
+        return dao.deleteById(id);
     }
 
 
@@ -119,37 +125,37 @@ public abstract class AbstractReactiveDomainService<T extends Domain<ID>, ID ext
 
     /* @Override
     public Page<T> findByField(String field, String value, Pageable pageable, Class<T> type) {
-        ensure(field, not(isEmptyString()));
-        ensure(value, not(isEmptyString()));
-        ensure(pageable, notNullValue());
-        ensure(type, notNullValue());
+        require(field, not(isEmptyString()));
+        require(value, not(isEmptyString()));
+        require(pageable, notNullValue());
+        require(type, notNullValue());
         return getDao().findByField(field, value, pageable, type);
     }
 
     @Override
     public Page<String> listField(String field, String value, Pageable pageable, Class<T> type) {
-        ensure(field, not(isEmptyString()));
-        ensure(value, not(isEmptyString()));
-        ensure(pageable, notNullValue());
-        ensure(type, notNullValue());
+        require(field, not(isEmptyString()));
+        require(value, not(isEmptyString()));
+        require(pageable, notNullValue());
+        require(type, notNullValue());
         return getDao().listField(field, value, pageable, type);
     } */
 
     @Override
     public Mono<Void> deleteAll() {
-        return getDao().deleteAll();
+        return dao.deleteAll();
     }
 
     @Override
     public Mono<Void> deleteAll(Iterable<T> domains) {
-        ensure(domains, not(empty()));
-        return getDao().deleteAll(domains);
+        require(domains, not(empty()));
+        return dao.deleteAll(domains);
     }
 
 
     @Override
     public Mono<Long> count() {
-        return getDao().count();
+        return dao.count();
     }
 
 

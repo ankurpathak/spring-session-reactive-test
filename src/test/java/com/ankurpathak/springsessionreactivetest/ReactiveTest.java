@@ -1,5 +1,5 @@
 package com.ankurpathak.springsessionreactivetest;
-
+/*
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 
@@ -16,3 +16,5 @@ public class ReactiveTest {
         );
     }
 }
+
+*/

@@ -23,13 +23,15 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>9</java.version>
         <valid4j.version>0.5.0</valid4j.version>
-        <hamcrest-juit.version>1.0.0.1</hamcrest-juit.version>
+        <!--<hamcrest-juit.version>1.0.0.1</hamcrest-juit.version>-->
+        <hamcrest-juit.version>2.0.0.0</hamcrest-juit.version>
         <commons-lang.version>3.8</commons-lang.version>
         <rsql-query-engine.version>0.7.1</rsql-query-engine.version>
         <guava.version>26.0-jre</guava.version>
         <username-validation.version>1.2.1</username-validation.version>
         <password-validaton.version>1.0.3-SNAPSHOT</password-validaton.version>
         <primitive-validation.version>1.0-SNAPSHOT</primitive-validation.version>
+        <geoip2.version>2.12.0</geoip2.version>
     </properties>
 
     <dependencies>
@@ -69,11 +71,19 @@
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
 
+        <!-- Spring Security Test -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hamcrest</groupId>
+                    <artifactId>hamcrest-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+        <!-- Spring Security Test -->
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-test</artifactId>
@@ -142,6 +152,27 @@
             <version>${primitive-validation.version}</version>
         </dependency>
         <!-- Ankur Validation Work -->
+
+
+        <!-- Maxmind Geoid2 -->
+        <dependency>
+            <groupId>com.maxmind.geoip2</groupId>
+            <artifactId>geoip2</artifactId>
+            <version>${geoip2.version}</version>
+        </dependency>
+        <!-- Maxmind Geoid2 -->
+
+
+        <dependency>
+            <groupId>com.github.jsurfer</groupId>
+            <artifactId>jsurfer-jackson</artifactId>
+            <version>1.4.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
 
 
     </dependencies>

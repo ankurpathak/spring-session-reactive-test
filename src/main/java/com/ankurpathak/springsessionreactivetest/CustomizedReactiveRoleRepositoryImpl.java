@@ -5,14 +5,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class CustomizedReactiveRoleRepositoryImpl extends AbstractCustomizedReactiveDomainRepository<Role, String> implements CustomizedReactiveRoleRepository {
-    private final ReactiveMongoTemplate template;
-
     public CustomizedReactiveRoleRepositoryImpl(ReactiveMongoTemplate template) {
-        this.template = template;
+        super(template);
     }
 
-    @Override
-    public ReactiveMongoTemplate getTemplate() {
-        return template;
-    }
 }

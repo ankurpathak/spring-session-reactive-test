@@ -4,11 +4,12 @@ package com.ankurpathak.springsessionreactivetest;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
+import reactor.core.publisher.Mono;
 
 import java.io.Serializable;
 import java.math.BigInteger;
 
-public class ExtendedDomain<ID extends Serializable> extends Domain<ID> {
+public abstract class ExtendedDomain<ID extends Serializable> extends Domain<ID> {
 
     @CreatedBy
     @JsonView({View.Public.class, View.Me.class})
@@ -20,7 +21,7 @@ public class ExtendedDomain<ID extends Serializable> extends Domain<ID> {
 
 
     public ExtendedDomain() {
-        createdBy = updatedBy = SecurityUtil.getMe().map(User::getId).orElse(User.ANONYMOUS_ID);
+            createdBy = updatedBy = User.ANONYMOUS_ID;
     }
 
     public BigInteger getCreatedBy() {
